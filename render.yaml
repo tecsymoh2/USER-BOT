@@ -1,16 +1,13 @@
-# Render Blueprint: New + > Blueprint > pick this repo. Fill in the secret values when asked.
+# Render Blueprint (free Web Service + your Neon database). New + > Blueprint > pick this repo.
 services:
-  - type: worker              # always-on background process (a free "web service" would go to sleep and disconnect)
+  - type: web
     name: personal-assistant
     runtime: docker
-    plan: starter             # workers are paid; check Render's current pricing
-    disk:                     # keeps your settings, allowed chats and notes across deploys
-      name: assistant-data
-      mountPath: /data
-      sizeGB: 1
+    plan: free
+    healthCheckPath: /health
     envVars:
-      - key: DB_PATH
-        value: /data/userbot.db
+      - key: DATABASE_URL     # your Neon connection string (settings live here, so redeploys don't reset them)
+        sync: false
       - key: TG_API_ID
         sync: false
       - key: TG_API_HASH
