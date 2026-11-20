@@ -1,0 +1,21 @@
+# Alternative: paid Background Worker with a persistent disk (no database needed). Rename to render.yaml to use it.
+services:
+  - type: worker
+    name: personal-assistant
+    runtime: docker
+    plan: starter
+    disk:
+      name: assistant-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DB_PATH
+        value: /data/userbot.db
+      - key: TG_API_ID
+        sync: false
+      - key: TG_API_HASH
+        sync: false
+      - key: TG_SESSION
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
