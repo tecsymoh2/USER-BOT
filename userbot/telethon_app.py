@@ -55,6 +55,18 @@ class TelethonIO:
             return None
 
 
+REQUIRED = ("TG_API_ID", "TG_API_HASH", "TG_SESSION", "GROQ_API_KEY")
+
+
+def read_config(environ):
+    """Returns (config dict, list of problems). Values are trimmed and stray quotes removed."""
+    clean = {k: (environ.get(k) or "").strip().strip("\"'").strip() for k in (*REQUIRED, "DATABASE_URL", "DB_PATH")}
+    problems = [f"{k} is empty or missing" for k in REQUIRED if not clean[k]]
+    if clean["TG_API_ID"] and not clean["TG_API_ID"].isdigit():
+        problems.append("TG_API_ID must be only digits (the number from my.telegram.org)")
+    return clean, problems
+
+
 def display_name(user):
     return " ".join(x for x in (getattr(user, "first_name", None), getattr(user, "last_name", None)) if x) or getattr(user, "username", None) or str(user.id)
 
@@ -79,11 +91,17 @@ async def health_server():
 async def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     await health_server()                                  # up immediately, so the host sees a healthy service
-    try:
-        api_id, api_hash, session = int(os.environ["TG_API_ID"]), os.environ["TG_API_HASH"], os.environ["TG_SESSION"]
-    except KeyError as e:
-        sys.exit(f"Missing environment variable {e}. See .env.example")
-    store = Store(os.environ.get("DB_PATH", "userbot.db"), url=os.environ.get("DATABASE_URL"))
+    cfg, problems = read_config(os.environ)
+    if problems:
+        log.error("Setup problem:\n  - " + "\n  - ".join(problems) +
+                  "\nOn Render: open your service > Environment, fill in these values, then Save, rebuild and deploy."
+                  "\nTG_SESSION comes from running login.py on your own phone/computer (see README).")
+        sys.exit(1)
+    api_id, api_hash, session = int(cfg["TG_API_ID"]), cfg["TG_API_HASH"], cfg["TG_SESSION"]
+    if not cfg["DATABASE_URL"]:
+        log.warning("No DATABASE_URL set: settings are kept in a local file and will reset when this host redeploys.")
+    os.environ["GROQ_API_KEY"] = cfg["GROQ_API_KEY"]
+    store = Store(cfg["DB_PATH"] or "userbot.db", url=cfg["DATABASE_URL"] or None)
     await asyncio.to_thread(store.wait_for_leadership, 5, log.info)   # never run two copies on one Telegram session
     client = TelegramClient(StringSession(session), api_id, api_hash)
     await client.connect()
