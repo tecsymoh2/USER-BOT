@@ -1,0 +1,21 @@
+# Render Blueprint: New + > Blueprint > pick this repo. Fill in the secret values when asked.
+services:
+  - type: worker              # always-on background process (a free "web service" would go to sleep and disconnect)
+    name: personal-assistant
+    runtime: docker
+    plan: starter             # workers are paid; check Render's current pricing
+    disk:                     # keeps your settings, allowed chats and notes across deploys
+      name: assistant-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DB_PATH
+        value: /data/userbot.db
+      - key: TG_API_ID
+        sync: false
+      - key: TG_API_HASH
+        sync: false
+      - key: TG_SESSION
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
