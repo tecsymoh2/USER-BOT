@@ -2,3 +2,4 @@
 *.session
 *.db
 __pycache__/
+session.txt

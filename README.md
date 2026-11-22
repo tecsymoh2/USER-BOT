@@ -55,14 +55,19 @@ Rename `render-worker.yaml` to `render.yaml`. No database or pinger needed; the 
 The included `Dockerfile` / `Procfile` work on Railway, Render, Fly.io or any VPS. Put the four variables in the host's secret settings and keep `DB_PATH` on a persistent volume.
 
 ## Using it
-Everything is controlled from **Saved Messages** with commands starting `.ai` (send `.ai help`):
-- `.ai allow @username` (or type `.ai on` inside that chat; the command message disappears)
-- `.ai mode draft|auto|off` · `.ai prompt <how to reply>` · `.ai faq <prices, hours, policies>`
-- `.ai hours 9 18` (you handle chats 9-18, it answers outside) · `.ai away <message>` · `.ai limit 30` · `.ai tz +3`
-- In a chat: `.ai pause 2h` · `.ai resume` · `.ai forget` · `.ai memory`
+Everything is controlled from **Saved Messages** with commands starting `.ai`. Send `.ai help` for topics:
+`core`, `safety`, `react`, `tools`, `organise`. Inside any chat you can also type commands (the message disappears and the answer goes to Saved Messages).
 
-**Drafts** arrive in Saved Messages: reply to a draft with `ok` to send it, `skip`, or type your own text to send that instead.
-If you type in a chat yourself, the assistant stays quiet there for 30 minutes. It also understands voice notes and photos, remembers short notes per person,
-and hands anything it can't answer to you (it tells you in Saved Messages and does not reply).
+**What it can do**
+- **Replies** (draft = you approve, or auto), per-chat **styles**, an FAQ, your **tone** learned from your own messages, short **memory** per person, **voice notes and photos** understood, **groups** (only when mentioned/replied to).
+- **Safety:** `.ai panic` kill switch, VIP list (never auto-replied, always alerts you), sensitive topics (money, PINs, passwords, codes) always handed to you, **urgent** and **scam** alerts (keyword-based, no AI, work in every private chat), optional **spam reporting**.
+- **Reactions:** `.ai react on` reacts to some messages in allowed chats (keyword or AI-picked emoji, limits per day); `.ai react ❤️` reacts on demand to the message you reply to.
+- **Stories:** `.ai stories view|react` views (and reacts to) stories from people you allow (`.ai story allow @name`), or all contacts (`.ai story all on`). Human-like delays and a daily limit. Needs a recent Telethon (`pip install -U telethon`).
+- **Away & quiet hours:** `.ai away until 2d <message>`, `.ai dnd 22 7`, working hours.
+- **Tools:** `.ai sum`, `.ai tr fr`, `.ai write <idea>`, templates (`.ai t price`), read-later (`.ai later`), M-Pesa confirmation log (`.ai payments on`), scheduled messages (`.ai send 2h @mum text`).
+- **Organise:** reminders, follow-ups ("remind me if they don't reply"), birthdays with a drafted greeting, a daily **digest**, `.ai recap` (who is waiting for you), appointment **booking** with conflict checks and reminders, backup/restore.
+- **Health:** it checks your session every few minutes and tells you in Saved Messages (and, if you set `ALERT_BOT_TOKEN` + `ALERT_CHAT_ID`, through a normal bot) if something is wrong.
 
-Tests (no login needed): `python tests/test_engine.py`
+**Drafts** arrive in Saved Messages: reply to a draft with `ok`, `skip`, or your own text. If you type in a chat yourself, the assistant stays quiet there for 30 minutes.
+
+Tests (no login needed): `python tests/test_engine.py && python tests/test_v2.py && python tests/test_glue.py` (the last one runs the Telegram wiring against a fake Telethon).
