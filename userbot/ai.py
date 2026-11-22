@@ -38,3 +38,13 @@ class GroqClient:
     async def transcribe(self, audio: bytes):
         data = await self._post("/audio/transcriptions", data={"model": self.whisper}, files={"file": ("voice.ogg", audio)})
         return data.get("text", "").strip()
+
+    async def tts(self, text):
+        """Experimental text-to-speech (WAV bytes)."""
+        model = os.environ.get("GROQ_TTS_MODEL", "canopylabs/orpheus-v1-english")
+        voice = os.environ.get("GROQ_TTS_VOICE", "autumn")
+        async with httpx.AsyncClient(timeout=60, headers={"Authorization": f"Bearer {self.key}"}) as c:
+            r = await c.post(BASE + "/audio/speech", json={"model": model, "input": text[:600], "voice": voice, "response_format": "wav"})
+        if r.status_code >= 400 or not r.content:
+            raise AIError("voice unavailable")
+        return r.content
