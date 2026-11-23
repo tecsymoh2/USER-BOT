@@ -6,13 +6,13 @@ import time
 DEFAULTS = {
     "mode": "draft",          # off | draft | auto
     "disclose": "1",          # first auto-reply says it comes from an assistant
-    "allow_all": "0",         # 0 = only chats you allowed with ".ai on"
+    "allow_all": "1",         # 0 = only chats you allowed with ".ai on"
     "instructions": "", "faq": "", "away": "",
     "hours_start": "", "hours_end": "",   # your working hours: the bot answers OUTSIDE them
     "tz": "3", "daily_limit": "50",
     "panic": "0", "prev_mode": "draft",
-    "react": "off", "react_mode": "lite", "react_prob": "0.4", "react_limit": "40",
-    "stories": "off", "story_emoji": "❤️", "story_limit": "30", "story_all": "0",
+    "react": "off", "react_mode": "lite", "react_prob": "0.4", "react_limit": "1000",
+    "stories": "off", "story_emoji": "❤️", "story_limit": "1000", "story_all": "0",
     "urgent": "1", "scam": "1", "spam": "0", "payments": "0", "booking": "0", "voice": "0",
     "away_until": "0", "away_msg": "", "dnd_start": "", "dnd_end": "", "digest_hour": "21", "styles": "{}",
 }
